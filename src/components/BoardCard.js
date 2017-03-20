@@ -27,7 +27,7 @@ class BoardCard extends React.Component {
     let {
       updateBoard,
       deleteBoard,
-      id
+      id,
     } = this.props
 
     return (
@@ -43,8 +43,7 @@ class BoardCard extends React.Component {
                 <a 
                   href="#" 
                   onClick={() =>  {
-                    let board = { id, name: this.name.value }
-                    updateBoard(board);
+                    updateBoard(id, this.name.value);
                     this.name = null;
                     this.toggleEdit();
                   }}

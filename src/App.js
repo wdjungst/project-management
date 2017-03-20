@@ -7,20 +7,41 @@ import {
 
 import Home from './components/Home';
 import BoardContainer from './components/BoardContainer';
+import Auth from './components/Auth';
 
 class App extends React.Component {
   state = { user: {} }
 
-  login = () => {
-    this.setState({ user: { isAuthenticated: true } });
+  componentDidMount() {
+    let id = localStorage.getItem('id');
+    let email = localStorage.getItem('email');
+    let client = localStorage.getItem('client');
+    let token = localStorage.getItem('token');
+    this.setUser({ id, client, token, email });  
+  }
+
+  setUser = (user) => { let { id, client, token, email } = user
+
+    if (localStorage.token !== token) {
+      localStorage.setItem('id', id)
+      localStorage.setItem('client', client)
+      localStorage.setItem('token', token)
+      localStorage.setItem('email', email)
+    }
+
+    this.setState({ user })
   }
 
   logout = () => {
+    ['id', 'email', 'client', 'token'].forEach( key => {
+      localStorage.removeItem(key)
+    });
+
     this.setState({ user: {} });
   }
 
   render() {
-    let { user: { isAuthenticated } } = this.state;
+    let { user: { token } } = this.state;
 
     return (
       <Router>
@@ -30,7 +51,7 @@ class App extends React.Component {
               <Link to="/" className="brand-logo">Logo</Link>
               <ul className="right">
 							  <li><Link to="/">Home</Link></li>
-                { isAuthenticated ?
+                { token ?
                   [
                     <li key="boards"><Link to="/boards">Boards</Link></li>,
                     <li key="logout">
@@ -46,12 +67,15 @@ class App extends React.Component {
               </ul>
             </div>
           </nav>
-          { this.state.user.isAuthenticated ?
+          { this.state.user.token ?
             <div>
               <Route exact path="/" component={Home} />
-              <Route path="/boards" component={BoardContainer} />
+              <Route 
+                path="/boards" 
+                render={(router) => <BoardContainer user={this.state.user} {...router} /> }
+              />
             </div> :
-            <button className="center btn" onClick={this.login}>Log In</button>
+            <Auth auth={this.setUser} />
           }
         </div>
       </Router>
