@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 class BoardCard extends React.Component {
   state = { editing: false }
@@ -55,6 +56,7 @@ class BoardCard extends React.Component {
               <div>
                 <a href="#" onClick={this.toggleEdit}>Edit</a>
                 <a href="#" onClick={() => deleteBoard(id)}>Delete</a>
+                <Link to={`/boards/${id}`}>Show</Link>
               </div>
             }
           </div>

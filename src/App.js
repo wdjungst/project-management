@@ -1,60 +1,61 @@
-import React, { Component } from 'react';
-import BoardForm from './components/BoardForm';
-import BoardCard from './components/BoardCard';
+import React from 'react';
+import { 
+  BrowserRouter as Router,
+  Link,
+  Route,
+} from 'react-router-dom';
 
-class App extends Component {
-  state = { boards: [], id: 1 }
-  
-  addBoard = (name) => { 
-    let { id } = this.state;
-    let board = { name, id }
-    this.setState( (state, props) => {
-      return {
-        boards: [board, ...state.boards],
-        id: state.id + 1
-      }
-    });
+import Home from './components/Home';
+import BoardContainer from './components/BoardContainer';
+
+class App extends React.Component {
+  state = { user: {} }
+
+  login = () => {
+    this.setState({ user: { isAuthenticated: true } });
   }
 
-  deleteBoard = (id) => {
-    this.setState( (state, props) => {
-      return { boards: state.boards.filter( b => b.id !== id ) }
-    })
-  }
-
-  updateBoard = (board) => {
-    this.setState( (state, props ) => {
-      let boards = state.boards.map( b => {
-        if (b.id === board.id)
-          return board;
-        return b;
-      });
-
-      return { boards }
-    });
+  logout = () => {
+    this.setState({ user: {} });
   }
 
   render() {
-    let boards = this.state.boards.map( (board) => {
-      return (
-        <BoardCard 
-          key={board.id} 
-          deleteBoard={this.deleteBoard}
-          updateBoard={this.updateBoard}
-          {...board} 
-        />
-      )
-    });
+    let { user: { isAuthenticated } } = this.state;
 
     return (
-      <div className="container">
-        <h1 className="center">Project Boards</h1>
-        <BoardForm addBoard={this.addBoard} />
-        <div className="row">
-          { boards }
+      <Router>
+        <div>
+          <nav className="purple darken-1">
+            <div className="nav-wrapper">
+              <Link to="/" className="brand-logo">Logo</Link>
+              <ul className="right">
+							  <li><Link to="/">Home</Link></li>
+                { isAuthenticated ?
+                  [
+                    <li key="boards"><Link to="/boards">Boards</Link></li>,
+                    <li key="logout">
+                      <a 
+                        href="#" 
+                        onClick={this.logout}
+                      >
+                        Logout
+                      </a>
+                    </li>
+                  ] : null
+                }
+              </ul>
+            </div>
+          </nav>
+          { this.state.user.isAuthenticated ?
+            <div>
+              <Route exact path="/" component={Home} />
+              <Route path="/boards" component={BoardContainer} />
+            </div> :
+            <button className="center btn" onClick={this.login}>Log In</button>
+          }
         </div>
-      </div>
-    );
+      </Router>
+    )
   }
 }
 
